@@ -94,7 +94,7 @@ def game():
         file.write("<" + "=" * 20 + ">\n")
         file.write("Nom d'utilisateur: " + pseudo + "\n")
         file.write("Bonne réponse(s):" + str(compteur_win) + "/" + str(tours_max) + "        (moyenne : " + str(int(100 * compteur_win / tours_max))  + "%)")
-        file.write("\nTemps pris: " + time_all)
+        file.write("\nTemps pris: " + time_all + "\n")
        
     input("")
     
