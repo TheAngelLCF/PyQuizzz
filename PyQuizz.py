@@ -87,7 +87,7 @@ def game():
         file.write("<" + "=" * 20 + ">\n")
         file.write("Nom d'utilisateur: " + pseudo + "\n")
         file.write("Bonne réponse(s):" + str(compteur_win) + "/" + str(tours_max) + "        (moyenne : " + str(int(100 * compteur_win / tours_max))  + "%)")
-        file.write("\nTemps: " + time_all)
+        file.write("\nTemps pris: " + time_all)
         
         
         
@@ -139,13 +139,17 @@ if __name__ == "__main__":
     liste_files = os.listdir()
     if("quizzz.csv" not in liste_files):
         print("La base de donnée n'est pas présente, téléchargement automatique en cours ...")
-        dl.urlretrieve("https://pastebin.com/raw/BaRdqZ66", "quizzz.csv")
-        print("Le fichier 'quizzz.csv' a été télécharger avec succés")
-    choix = ""
-    while choix not in ["jouer", "ajouter"]:
-        choix = input("Que veux-tu faire (choix possible: jouer | ajouter): ")
-        
-    if(choix == "jouer"):
-        game()
-    else:
-        modif()
+        try:
+            dl.urlretrieve("https://pastebin.com/raw/BaRdqZ66", "quizzz.csv")
+            print("Le fichier 'quizzz.csv' a été télécharger avec succés")
+            
+            choix = ""
+            while choix not in ["jouer", "ajouter"]:
+                choix = input("Que veux-tu faire (choix possible: jouer | ajouter): ")
+                
+            if(choix == "jouer"):
+                game()
+            else:
+                modif()
+        except:
+            print("Le fichier 'quizzz.csv' n'a pas pu être télécharger. Merci de vérifier votre connexion internet !")  
