@@ -5,6 +5,8 @@ def temp_pris(start, end):
     """Permet de calculer le temps que l'utilisateur à pris
     param : start / end : tuple (minutes, secondes)
     param : minutes / secondes : int
+    
+    return str
     """
     retour = ''
     start_m, start_s = start 
