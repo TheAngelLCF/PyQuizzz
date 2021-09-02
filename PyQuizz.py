@@ -1,6 +1,7 @@
 import logistique
 from datetime import datetime
-from random import randint
+import os
+import urllib.request as dl
 def game():
     
     dico_csv = logistique.import_csv()
@@ -83,7 +84,7 @@ def game():
     print("Merci d'avoir jouez à PyQuizzz !")
     
     with open('resultat.txt', 'a', encoding='utf-8') as file:
-        file.write("<================================>\n")
+        file.write("<" + "=" * 20 + ">\n")
         file.write("Nom d'utilisateur: " + pseudo + "\n")
         file.write("Bonne réponse(s):" + str(compteur_win) + "/" + str(tours_max) + "        (moyenne : " + str(int(100 * compteur_win / tours_max))  + "%)")
         file.write("\nTemps: " + time_all)
@@ -99,6 +100,9 @@ def modif():
     if(t_or_f.lower() == "oui"):
         print("\n\n\nVoila comment fonctionne l'ajout de question dans la base de données, juste après ces petites explications, le programme va vous demandez combien de réponse voulez-vous mettre (entre 2 et 4), suivant cela, il va vous demandez les réponses que vous allez enregistrez (à noter que une seule des réponses est la bonne, les autres devront être fausses). Après ceci, il va vous demandez la question, pour des raisons évidentes, merci de ne pas integrer la réponse dans la question, puis, vous devrez dire laquelle des réponse est la bonne. Après cela, le programme ajoutera tous dans la base de données, et vous pourrez donc partager le code avec vos amis :)\n")
         
+    
+    question = input("Quelle est la question ? : ")
+    
     rep_max = 0
     while not(rep_max >= 2 and rep_max <= 4):
         try:
@@ -111,11 +115,8 @@ def modif():
     reps = []
     for k in range(1, rep_max + 1):
         reps.append(input("Réponse numéro " + str(k) + " : "))
-        
     for _ in range(4 - rep_max):
         reps.append(" ")
-        
-    question = input("Quelle est la question ? : ")
     
     temps_compteur = 0
     
@@ -135,6 +136,11 @@ def modif():
 
 
 if __name__ == "__main__":
+    liste_files = os.listdir()
+    if("quizzz.csv" not in liste_files):
+        print("La base de donnée n'est pas présente, téléchargement automatique en cours ...")
+        dl.urlretrieve("https://pastebin.com/raw/BaRdqZ66", "quizzz.csv")
+        print("Le fichier 'quizzz.csv' a été télécharger avec succés")
     choix = ""
     while choix not in ["jouer", "ajouter"]:
         choix = input("Que veux-tu faire (choix possible: jouer | ajouter): ")
