@@ -95,9 +95,13 @@ def game():
         file.write("Nom d'utilisateur: " + pseudo + "\n")
         file.write("Bonne réponse(s):" + str(compteur_win) + "/" + str(tours_max) + "        (moyenne : " + str(int(100 * compteur_win / tours_max))  + "%)")
         file.write("\nTemps pris: " + time_all)
-        
-        
-        
+       
+    input("")
+    
+    start()
+    
+    return None
+          
 
 def modif():
     print("Vous venez de rentrer dans la fonction de mise à jour du fichier csv, en cas problème, merci de contacter un administrateur PyQuizzz")
@@ -139,10 +143,11 @@ def modif():
         
     logistique.edit_file(len(logistique.import_csv()), question, reps, temps_compteur)
     
+    start()
+    
     return None
 
-
-if __name__ == "__main__":
+def start():
     liste_files = os.listdir()
     if("quizzz.csv" not in liste_files):
         print("La base de donnée n'est pas présente, téléchargement automatique en cours ...")
@@ -159,3 +164,6 @@ if __name__ == "__main__":
         game()
     else:
         modif()
+
+if __name__ == "__main__":
+    start()
