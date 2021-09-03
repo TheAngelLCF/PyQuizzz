@@ -178,7 +178,7 @@ def modif():
         request.urlopen(req)
     except:
         print('Erreur, merci de contacter un administrateur PyQuizzz !')
-        input('Impossible d\'envoyer la question dans le serveur, veuillez cliquez sur une entrée pour continuer')
+        input('Impossible d\'envoyer la question dans le serveur, veuillez cliquez sur \'entrée\' pour continuer')
     
     
     logistique.edit_file(len(logistique.import_csv()), question, reps, temps_compteur)
