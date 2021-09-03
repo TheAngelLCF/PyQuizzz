@@ -6,7 +6,6 @@ try:
     temps = "os"
     import os
     temps = "urllib"
-    import urllib.request as dl
     from urllib import request
     temps = 'json'
     import json
@@ -14,6 +13,15 @@ try:
 except ModuleNotFoundError:
     print("Une erreur d'importation est survenue avec le module : '" + temps + "'. Merci de contacter un administrateur PyQuizzz")
     excepted = False
+    
+try:
+    from pypresence import Presence
+    
+    rpc = Presence("883449660801450015")
+    rpc.connect()
+    rpc.update(state="github.com/TheAngelLCF/PyQuizzz", details="En cours de développement", large_image="python")
+except:
+    print("Le module 'PyPresence' n'est pas présent, skip fait sur cette importation")
     
 
 """              
@@ -149,6 +157,11 @@ def modif():
         if(oui_non == "oui"):
             break
     
+    if(oui_non == "non"):
+        print("Vous avez mit 'non' à toute les possibiltés, le programme ne peut donc pas ajouter cette question")
+        start()
+        return None
+    
     WEBHOOK_URL = 'https://discord.com/api/webhooks/883054140899590145/97iNGJZiVKm0Qxup6ChfLLKG0e0L_CVIsuqwSk2kh1nQNKqmrcdpdrL4L-TUH-UOifWz'
     
     temps = '|'
@@ -163,6 +176,7 @@ def modif():
         'embeds' : [
             {
                 'description': 'Question: ' + question + '\nRéponses: ' + temps + '\nBonne réponse: ' + str(temps_compteur),
+                'author': {'name': 'PyQuizzz'}
             }
             ]
         }
@@ -178,7 +192,7 @@ def modif():
         request.urlopen(req)
     except:
         print('Erreur, merci de contacter un administrateur PyQuizzz !')
-        input('Impossible d\'envoyer la question dans le serveur, veuillez cliquez sur \'entrée\' pour continuer')
+        input('Impossible d\'envoyer la question dans le serveur, veuillez cliquez sur une entrée pour continuer')
     
     
     logistique.edit_file(len(logistique.import_csv()), question, reps, temps_compteur)
@@ -192,13 +206,13 @@ def start():
     if("quizzz.csv" not in liste_files):
         print("La base de donnée n'est pas présente, téléchargement automatique en cours ...")
         try:
-            dl.urlretrieve("https://pastebin.com/raw/BaRdqZ66", "quizzz.csv")
+            request.request.urlretrieve("https://pastebin.com/raw/BaRdqZ66", "quizzz.csv")
             print("Le fichier 'quizzz.csv' a été télécharger avec succés")
         except:
             print("Le fichier 'quizzz.csv' n'a pas pu être télécharger. Merci de vérifier votre connexion internet !")
     choix = ""
     while choix not in ["jouer", "ajouter", "stop"]:
-        choix = input("Que veux-tu faire (choix possible: jouer | ajouter | stop ): ")
+        choix = input("Que veux-tu faire (choix possible: jouer | ajouter | stop): ")
                 
     if(choix == "jouer"):
         game()
@@ -208,4 +222,6 @@ def start():
         modif()
 
 if __name__ == "__main__" and excepted:
+    del(temps)
+    del(excepted)
     start()
