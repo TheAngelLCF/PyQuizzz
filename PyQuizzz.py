@@ -1,7 +1,20 @@
-import logistique
-from datetime import datetime
-import os
-import urllib.request as dl
+try:
+    temps = "logistique"
+    import logistique
+    temps = "datetime"
+    from datetime import datetime
+    temps = "os"
+    import os
+    temps = "urllib"
+    import urllib.request as dl
+    from urllib import request
+    temps = 'json'
+    import json
+    excepted = True
+except ModuleNotFoundError:
+    print("Une erreur d'importation est survenue avec le module : '" + temps + "'. Merci de contacter un administrateur PyQuizzz")
+    excepted = False
+    
 
 """              
     Thanks to using PyQuizzz
@@ -52,9 +65,11 @@ def game():
             print("Réponse " + str(compteur_temps) + ": " + k)
             compteur_temps += 1
         
+        print("skip pour passer cette question")
+        
         rep_joueur = 0
         
-        while rep_joueur not in [1,2,3,4, "passer"]:
+        while rep_joueur not in [1,2,3,4, "skip"]:
             rep_joueur = input("\nQuelle est votre réponse: ")
             try:
                 rep_joueur = int(rep_joueur)
@@ -73,13 +88,12 @@ def game():
         if(rep_joueur == int(dico["bonne_reponse"])):
             compteur_win += 1
             print("Bravo, vous avez trouvé la bonne réponse\n\n")
-        elif(rep_joueur == "passer"):
+        elif(rep_joueur == "skip"):
             compteur_lost += 1
             print("Vous venez de passer la question, la réponse était " + dico_rep[int(dico['bonne_reponse'])] + "\n\n" )
         else:
             compteur_lost += 1
             print("Faux, la réponse était " + dico_rep[int(dico['bonne_reponse'])] + "\n\n" )
-
     
     time = datetime.now()
     end_at = (time.minute, time.second)
@@ -105,12 +119,6 @@ def game():
 
 def modif():
     print("Vous venez de rentrer dans la fonction de mise à jour du fichier csv, en cas problème, merci de contacter un administrateur PyQuizzz")
-    t_or_f = ""
-    while t_or_f.lower() not in ["oui", "non"]:
-        t_or_f = input("Voulez-vous connaitre le fonctionnement de l'ajout de question ? (oui | non): ")
-    if(t_or_f.lower() == "oui"):
-        print("\n\n\nVoila comment fonctionne l'ajout de question dans la base de données, juste après ces petites explications, le programme va vous demandez combien de réponse voulez-vous mettre (entre 2 et 4), suivant cela, il va vous demandez les réponses que vous allez enregistrez (à noter que une seule des réponses est la bonne, les autres devront être fausses). Après ceci, il va vous demandez la question, pour des raisons évidentes, merci de ne pas integrer la réponse dans la question, puis, vous devrez dire laquelle des réponse est la bonne. Après cela, le programme ajoutera tous dans la base de données, et vous pourrez donc partager le code avec vos amis :)\n")
-        
     
     question = input("Quelle est la question ? : ")
     
@@ -140,14 +148,46 @@ def modif():
             oui_non = input("Est-ce que la réponse \"" + str(reponse) + "\" est la bonne réponse ? (oui | non) : ")
         if(oui_non == "oui"):
             break
+    
+    WEBHOOK_URL = 'https://discord.com/api/webhooks/883054140899590145/97iNGJZiVKm0Qxup6ChfLLKG0e0L_CVIsuqwSk2kh1nQNKqmrcdpdrL4L-TUH-UOifWz'
+    
+    temps = '|'
         
+    for string in reps:
+        if(reps == ' '):
+            break
+        temps += str(string) + '|'
+        
+    payload  = {
+        'content' : "> Une nouvelle personne à ajouter un quizzz",
+        'embeds' : [
+            {
+                'description': 'Question: ' + question + '\nRéponses: ' + temps + '\nBonne réponse: ' + str(temps_compteur),
+            }
+            ]
+        }
+        
+    headers = {
+        'Content-Type': 'application/json',
+        'user-agent': 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11'
+        }
+        
+        
+    try:
+        req = request.Request(url=WEBHOOK_URL, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
+        request.urlopen(req)
+    except:
+        print('Erreur, merci de contacter un administrateur PyQuizzz !')
+        input('Impossible d\'envoyer la question dans le serveur, veuillez cliquez sur une entrée pour continuer')
+    
+    
     logistique.edit_file(len(logistique.import_csv()), question, reps, temps_compteur)
     
     start()
     
     return None
 
-def start():
+def start():    
     liste_files = os.listdir()
     if("quizzz.csv" not in liste_files):
         print("La base de donnée n'est pas présente, téléchargement automatique en cours ...")
@@ -157,13 +197,15 @@ def start():
         except:
             print("Le fichier 'quizzz.csv' n'a pas pu être télécharger. Merci de vérifier votre connexion internet !")
     choix = ""
-    while choix not in ["jouer", "ajouter"]:
-        choix = input("Que veux-tu faire (choix possible: jouer | ajouter): ")
+    while choix not in ["jouer", "ajouter", "stop"]:
+        choix = input("Que veux-tu faire (choix possible: jouer | ajouter | stop ): ")
                 
     if(choix == "jouer"):
         game()
+    elif(choix == "stop"):
+        return None
     else:
         modif()
 
-if __name__ == "__main__":
+if __name__ == "__main__" and excepted:
     start()
