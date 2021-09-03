@@ -11,7 +11,8 @@
 
 ## Prerequisites
 
-- Python 3
+- [Python 3](https://www.python.org)
+- [PyPresence](https://github.com/qwertyquerty/pypresence#installation)
 
 ## Author
 
