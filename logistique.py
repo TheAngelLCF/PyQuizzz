@@ -1,12 +1,35 @@
 import csv
 from random import randint
 
-def temp_pris(start, end):
-    """Permet de calculer le temps que l'utilisateur à pris
-    param : start / end : tuple (minutes, secondes)
-    param : minutes / secondes : int
+def rich_presence():
+    """
+    Initilazes the connection on this programme and Discord
     
-    return str
+    return type: None
+    """
+    try:
+        from pypresence import Presence
+        
+        rpc = Presence("883449660801450015")
+        rpc.connect()
+        rpc.update(state="github.com/TheAngelLCF/PyQuizzz",
+                   details="En cours de développement",
+                   large_image="python",
+                   large_text="Made by Python",
+                   buttons=[{"label": "Github (offline)", "url": "https://github.com/TheAngelLCF/PyQuizzz"}])
+        return None
+    except:
+        print("Le module 'PyPresence' n'est pas présent, skip fait sur cette importation")
+        return None
+
+def temp_pris(start, end):
+    """
+    Permet de calculer le temps que l'utilisateur à pris
+    
+    param :
+    start / end : tuple int (minutes, secondes)
+    
+    return type: str
     """
     retour = ''
     start_m, start_s = start 
@@ -29,6 +52,14 @@ def temp_pris(start, end):
     return retour
 
 def ecart(first, second):
+    """
+    Retourne l'écart entre deux chiffres dans une horlogue
+    
+    param:
+    first / second : int
+    
+    return type Int
+    """
     ecart_int = 0
     while first != second:
         if(first == 60):
@@ -39,23 +70,47 @@ def ecart(first, second):
             first += 1
     return ecart_int
 
-def create_file(): # id/question/reps(liste)/bonne reponse
-    with open('quizzz.csv', 'w', encoding='utf-8') as csv_file:
-        csv_file.write("id,question,reps,bonne_reponse\n")
-
 def import_csv():
+    """
+    Charge la base de donnée csv compris dans la racine du programme de nom 'pyquizzz.csv'
+    
+    param:
+    None
+    
+    return type Liste de Dictionnaires
+    """
     with open('quizzz.csv', "r", encoding='utf-8') as csv_file:
         it_dictreader = csv.DictReader(csv_file, delimiter='|')    
         table = [dict(enregistrement) for enregistrement in it_dictreader]
     return table
 
 def edit_file(idd, question, reps, bonne_reponse):
+    """
+    Permet d'ajouter dans la base de données csv compris dans la racine du programme de nom 'pyquizzz.csv' des données
+    
+    param:
+    idd: int
+    question: str
+    reps: list
+    bonne_reponse: int
+    
+    return type None
+    """
     with open('quizzz.csv', 'a', encoding='utf-8') as csv_file:
         rep1,rep2,rep3,rep4 = reps
         csv_file.write(str(idd) + "|" + str(question) + "|" + str(rep1) + "|" + str(rep2) + "|"  + str(rep3) + "|"  + str(rep4) + "|" + str(bonne_reponse) + "\n")
         print("Logs: Ajout effectué dans la base de donnée")
+    return None
         
 def random_int_on_dic(dico):
+    """
+    Créer une liste avec des nombreux aléatoire uniques
+    
+    param:
+    dico: Dictionnaire
+    
+    return type List
+    """
     taille_dico = len(dico)
     deja_pris = []
     while len(deja_pris) != taille_dico:
@@ -65,11 +120,16 @@ def random_int_on_dic(dico):
     return deja_pris
 
 def randomise_dico(dico):
+    """
+    Génére une liste de dictionnaire mélangé aléatoirement
+    
+    param:
+    dico: Dictionnaire
+    
+    return type List
+    """
     random_int = random_int_on_dic(dico)
     new_dico = []
     for number in random_int:
         new_dico.append(dico[number])
     return new_dico
-
-
-        

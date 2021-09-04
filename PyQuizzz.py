@@ -14,14 +14,7 @@ except ModuleNotFoundError:
     print("Une erreur d'importation est survenue avec le module : '" + temps + "'. Merci de contacter un administrateur PyQuizzz")
     excepted = False
     
-try:
-    from pypresence import Presence
-    
-    rpc = Presence("883449660801450015")
-    rpc.connect()
-    rpc.update(state="github.com/TheAngelLCF/PyQuizzz", details="En cours de développement", large_image="python")
-except:
-    print("Le module 'PyPresence' n'est pas présent, skip fait sur cette importation")
+
     
 
 """              
@@ -162,7 +155,7 @@ def modif():
         start()
         return None
     
-    WEBHOOK_URL = 'https://discord.com/api/webhooks/883054140899590145/97iNGJZiVKm0Qxup6ChfLLKG0e0L_CVIsuqwSk2kh1nQNKqmrcdpdrL4L-TUH-UOifWz'
+    webhook = 'https://discord.com/api/webhooks/883054140899590145/97iNGJZiVKm0Qxup6ChfLLKG0e0L_CVIsuqwSk2kh1nQNKqmrcdpdrL4L-TUH-UOifWz'
     
     temps = '|'
         
@@ -188,7 +181,7 @@ def modif():
         
         
     try:
-        req = request.Request(url=WEBHOOK_URL, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
+        req = request.Request(url=webhook, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
         request.urlopen(req)
     except:
         print('Erreur, merci de contacter un administrateur PyQuizzz !')
@@ -224,4 +217,5 @@ def start():
 if __name__ == "__main__" and excepted:
     del(temps)
     del(excepted)
+    logistique.rich_presence()
     start()
