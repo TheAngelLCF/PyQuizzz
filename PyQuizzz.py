@@ -7,12 +7,11 @@ try:
     import os
     temps = "urllib"
     from urllib import request
-    temps = 'json'
-    import json
-    excepted = True
+    temps = 'time.sleep'
+    from time import sleep
 except ModuleNotFoundError:
-    print("Une erreur d'importation est survenue avec le module : '" + temps + "'. Merci de contacter un administrateur PyQuizzz")
-    excepted = False
+    input("Une erreur d'importation est survenue avec le module : '" + temps + "'. Merci de contacter un administrateur PyQuizzz")
+    exit()
     
 
     
@@ -25,7 +24,7 @@ except ModuleNotFoundError:
 
 def game():
     
-    dico_csv = logistique.import_csv()
+    dico_csv = logistique.import_csv('quizzz.csv')
     
     game_dico = logistique.randomise_dico(dico_csv)
     
@@ -105,11 +104,29 @@ def game():
     print("Vous avez prit " + time_all)
     print("Merci d'avoir jouez à PyQuizzz !")
     
+    t = "Bonne réponse(s):" + str(compteur_win) + "/" + str(tours_max) + "\n(moyenne : " + str(int(100 * compteur_win / tours_max))  + "%)"
+    
     with open('resultat.txt', 'a', encoding='utf-8') as file:
         file.write("<" + "=" * 20 + ">\n")
         file.write("Nom d'utilisateur: " + pseudo + "\n")
-        file.write("Bonne réponse(s):" + str(compteur_win) + "/" + str(tours_max) + "        (moyenne : " + str(int(100 * compteur_win / tours_max))  + "%)")
+        file.write(t)
         file.write("\nTemps pris: " + time_all + "\n")
+        
+    payload  = {
+        'embeds' : [
+            {
+                'title': 'Résultat (hastebin.com)',
+                'description': t,
+                'url': 'http://hastebin.com/' + logistique.hastebin_make(t),
+                'author': {'name': pseudo.upper()}
+            }
+            ]
+        }
+    
+    dico_config = logistique.import_csv('config.csv')
+    
+    if(dico_config[0]['webhook_yn'] == 'oui'):
+        logistique.webhook_sender(dico_config[0]['webhook'], payload)
        
     input("")
     
@@ -155,7 +172,7 @@ def modif():
         start()
         return None
     
-    webhook = 'https://discord.com/api/webhooks/883054140899590145/97iNGJZiVKm0Qxup6ChfLLKG0e0L_CVIsuqwSk2kh1nQNKqmrcdpdrL4L-TUH-UOifWz'
+    config_csv = logistique.import_csv('config.csv')
     
     temps = '|'
         
@@ -163,32 +180,8 @@ def modif():
         if(reps == ' '):
             break
         temps += str(string) + '|'
-        
-    payload  = {
-        'content' : "> Une nouvelle personne à ajouter un quizzz",
-        'embeds' : [
-            {
-                'description': 'Question: ' + question + '\nRéponses: ' + temps + '\nBonne réponse: ' + str(temps_compteur),
-                'author': {'name': 'PyQuizzz'}
-            }
-            ]
-        }
-        
-    headers = {
-        'Content-Type': 'application/json',
-        'user-agent': 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11'
-        }
-        
-        
-    try:
-        req = request.Request(url=webhook, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
-        request.urlopen(req)
-    except:
-        print('Erreur, merci de contacter un administrateur PyQuizzz !')
-        input('Impossible d\'envoyer la question dans le serveur, veuillez cliquez sur une entrée pour continuer')
     
-    
-    logistique.edit_file(len(logistique.import_csv()), question, reps, temps_compteur)
+    logistique.edit_quizzz(len(logistique.import_csv('quizzz.csv')), question, reps, temps_compteur)
     
     start()
     
@@ -199,23 +192,53 @@ def start():
     if("quizzz.csv" not in liste_files):
         print("La base de donnée n'est pas présente, téléchargement automatique en cours ...")
         try:
-            request.request.urlretrieve("https://pastebin.com/raw/BaRdqZ66", "quizzz.csv")
+            request.urlretrieve("https://pastebin.com/raw/BaRdqZ66", "quizzz.csv")
             print("Le fichier 'quizzz.csv' a été télécharger avec succés")
         except:
             print("Le fichier 'quizzz.csv' n'a pas pu être télécharger. Merci de vérifier votre connexion internet !")
     choix = ""
-    while choix not in ["jouer", "ajouter", "stop"]:
-        choix = input("Que veux-tu faire (choix possible: jouer | ajouter | stop): ")
+    while choix not in ["jouer", "ajouter", "stop", "editer config"]:
+        choix = input("Que veux-tu faire (choix possible: jouer | ajouter | editer config | stop): ")
                 
     if(choix == "jouer"):
         game()
-    elif(choix == "stop"):
-        return None
-    else:
+    elif(choix == "editer config"):
+        first_init()
+    elif(choix == "ajouter"):
         modif()
+        exit()
+        
+def first_init():
+    print('Bienvenue sur PyQuizzz\n\nPyQuizzz a besoin de quelques informations pour pouvoir fonctionner correctement')
+    
+    autorisation_internet = ''
+    webhook_yn = ''
+    webhook = ''
+    
+    while autorisation_internet.lower() not in ["oui", "non"]:
+        autorisation_internet = input("Autorisez-vous PyQuizzz à se connecter à Internet pour faire des mises à jour ? (oui | non) : ")
+        if(autorisation_internet == 'non'):
+            input('Malheuresement, PyQuizzz est dans l\'obligation d\'utiliser la connection internet pour faire la premiere initialisation correctement. Faite la touche \'Entrée\' pour éteindre le programme')
+            exit()
+    
+    while webhook_yn.lower() not in ["oui", "non"]:
+        webhook_yn = input("Voulez-vous que vos résultats soit envoyé sur un serveur discord (webhook) ? (oui | non) : ")
+        
+    webhook = 'None'
+    
+    if(webhook_yn == 'oui'):
+        webhook = input("Merci de mettre l'url du webhook (Paramètres du serveur / Intégrations / Créer un webhook) ==> ")
+        
+    logistique.create_config(webhook_yn, webhook)
+    
+    start()
+    
+    return None
 
-if __name__ == "__main__" and excepted:
+
+if __name__ == "__main__":
     del(temps)
-    del(excepted)
+    if('config.csv' not in os.listdir()):
+        first_init()
     logistique.rich_presence()
     start()

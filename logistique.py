@@ -70,21 +70,21 @@ def ecart(first, second):
             first += 1
     return ecart_int
 
-def import_csv():
+def import_csv(csv123):
     """
-    Charge la base de donnée csv compris dans la racine du programme de nom 'pyquizzz.csv'
+    Charge la base de donnée csv compris dans la racine du programme de nom de la valeur de 'csv'
     
     param:
-    None
+    csv: str
     
     return type Liste de Dictionnaires
     """
-    with open('quizzz.csv', "r", encoding='utf-8') as csv_file:
+    with open(csv123, "r", encoding='utf-8') as csv_file:
         it_dictreader = csv.DictReader(csv_file, delimiter='|')    
         table = [dict(enregistrement) for enregistrement in it_dictreader]
     return table
 
-def edit_file(idd, question, reps, bonne_reponse):
+def edit_quizzz(idd, question, reps, bonne_reponse):
     """
     Permet d'ajouter dans la base de données csv compris dans la racine du programme de nom 'pyquizzz.csv' des données
     
@@ -101,6 +101,10 @@ def edit_file(idd, question, reps, bonne_reponse):
         csv_file.write(str(idd) + "|" + str(question) + "|" + str(rep1) + "|" + str(rep2) + "|"  + str(rep3) + "|"  + str(rep4) + "|" + str(bonne_reponse) + "\n")
         print("Logs: Ajout effectué dans la base de donnée")
     return None
+
+def create_config(webhook_yn, webhook_url):
+    with open('config.csv', 'w', encoding='utf-8') as config_file:
+        config_file.write('webhook_yn|webhook\n' + webhook_yn + '|' + webhook_url)
         
 def random_int_on_dic(dico):
     """
@@ -133,3 +137,32 @@ def randomise_dico(dico):
     for number in random_int:
         new_dico.append(dico[number])
     return new_dico
+
+def webhook_sender(webhook_url, payload):
+    try:
+        from urllib import request
+        import json
+    except:
+        return None
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'user-agent': 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11'
+        }
+        
+    try:
+        req = request.Request(url=webhook_url, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
+        request.urlopen(req)
+    except:
+        print('Erreur durant l\'envoye au webhook \'' + webhook_url + '\', merci de contacter un administrateur PyQuizzz !')
+
+def hastebin_make(payload):
+    try:
+        import requests
+    except:
+        return None
+    
+    post = requests.post('http://hastebin.com/documents', data=payload)
+    if(post.status_code == 200):
+        return post.json()['key']
+    return None
