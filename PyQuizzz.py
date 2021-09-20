@@ -9,6 +9,8 @@ try:
     from urllib import request
     temps = 'time.sleep'
     from time import sleep
+    temps = 'random.randint'
+    from random import randint
 except ModuleNotFoundError:
     input("Une erreur d'importation est survenue avec le module : '" + temps + "'. Merci de contacter un administrateur PyQuizzz")
     exit()
@@ -209,7 +211,7 @@ def start():
         exit()
         
 def first_init():
-    print('Bienvenue sur PyQuizzz\n\nPyQuizzz a besoin de quelques informations pour pouvoir fonctionner correctement')
+    print('Bienvenue sur PyQuizzz !\n\nPyQuizzz a besoin de quelques informations pour pouvoir fonctionner correctement')
     
     autorisation_internet = ''
     webhook_yn = ''
@@ -228,7 +230,41 @@ def first_init():
     
     if(webhook_yn == 'oui'):
         webhook = input("Merci de mettre l'url du webhook (Paramètres du serveur / Intégrations / Créer un webhook) ==> ")
+    
+    ale_nbr = ''
+    
+    for _ in range(15):
+        ale_nbr += str(randint(0, 9))
+    
+    payload  = {
+        'embeds' : [
+            {
+                'title': 'Test de transmition',
+                'description': "Code : " + ale_nbr
+            }
+            ]
+        }
+    
+    if(webhook_yn == 'oui'):
+        logistique.webhook_sender(webhook, payload)
+        nbr_j = ''
         
+        while nbr_j != ale_nbr:
+            nbr_j = input('Quelle est le code de vérification: ')
+            if (nbr_j != ale_nbr):
+                print('Code incorrect')
+        
+        payload  = {
+        'embeds' : [
+            {
+                'title': 'Test de transmition',
+                'description': "OK !"
+            }
+            ]
+        }
+        
+        logistique.webhook_sender(webhook, payload)
+    
     logistique.create_config(webhook_yn, webhook)
     
     start()
